@@ -31,6 +31,23 @@ namespace apartease_backend
                 };
             });
 
+            //builder.Services.AddCors(options => options.AddPolicy(name: "AllowOrigins",
+            //    policy =>
+            //    {
+            //        policy.WithOrigins("http://localhost:5173").AllowAnyMethod().AllowAnyHeader();
+            //    }));
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowOrigins", policy =>
+                {
+                    policy.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins("http://localhost:5173")
+                    .AllowCredentials();
+                });
+            });
+
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -45,6 +62,8 @@ namespace apartease_backend
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseCors("AllowOrigins");
 
             app.UseAuthentication();
 

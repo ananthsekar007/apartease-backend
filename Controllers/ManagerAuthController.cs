@@ -13,7 +13,7 @@ using Azure.Core;
 
 namespace apartease_backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/manager")]
     [ApiController]
     public class ManagerAuthController : ControllerBase
     {
