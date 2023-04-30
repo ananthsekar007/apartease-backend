@@ -1,6 +1,6 @@
 ﻿using apartease_backend.Models;
 
-namespace apartease_backend.Dao
+namespace apartease_backend.Dao.ManagerDao
 {
     public class ManagerAuthResponse
     {

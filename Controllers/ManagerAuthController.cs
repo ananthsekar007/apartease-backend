@@ -10,10 +10,11 @@ using apartease_backend.Models;
 using apartease_backend.Dao;
 using apartease_backend.Helpers;
 using Azure.Core;
+using apartease_backend.Dao.ManagerDao;
 
 namespace apartease_backend.Controllers
 {
-    [Route("api/manager")]
+    [Route("api/auth/manager")]
     [ApiController]
     public class ManagerAuthController : ControllerBase
     {
