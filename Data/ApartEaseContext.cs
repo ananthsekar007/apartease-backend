@@ -20,6 +20,12 @@ namespace apartease_backend.Data
 
         public DbSet<Resident> Resident { get; set; } = default!;
 
+        public DbSet<Vendor> Vendor { get; set; } = default!;
+
+        public DbSet<Company> Company { get; set; } = default!;
+
+        public DbSet<Category> Category { get; set; } = default!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Manager>()
@@ -31,6 +37,16 @@ namespace apartease_backend.Data
                 .HasMany(a => a.Residents)
                 .WithOne(r => r.Apartment)
                 .HasForeignKey(r => r.ApartmentId);
+
+            modelBuilder.Entity<Vendor>()
+                .HasOne(v => v.Company)
+                .WithOne(c => c.Vendor)
+                .HasForeignKey<Vendor>(v => v.CompanyId);
+
+            modelBuilder.Entity<Company>()
+                .HasOne(c => c.Category)
+                .WithMany(cat => cat.Companies)
+                .HasForeignKey(c => c.CategoryId);
         }
     }
 }
