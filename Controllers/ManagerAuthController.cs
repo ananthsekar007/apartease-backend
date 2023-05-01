@@ -11,6 +11,7 @@ using apartease_backend.Dao;
 using apartease_backend.Helpers;
 using Azure.Core;
 using apartease_backend.Dao.ManagerDao;
+using Microsoft.AspNetCore.Authorization;
 
 namespace apartease_backend.Controllers
 {

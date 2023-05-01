@@ -23,6 +23,5 @@ namespace apartease_backend.Models
 
         public virtual Manager Manager { get; set; }
 
-        public virtual ICollection<Resident> Residents { get; set; }
     }
 }

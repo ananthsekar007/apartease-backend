@@ -28,15 +28,15 @@ namespace apartease_backend.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Manager>()
-                .HasOne(u => u.Apartment)
-                .WithOne(p => p.Manager)
+            modelBuilder.Entity<Apartment>()
+                .HasOne(a => a.Manager)
+                .WithOne()
                 .HasForeignKey<Apartment>(p => p.ManagerId);
 
-            modelBuilder.Entity<Apartment>()
-                .HasMany(a => a.Residents)
-                .WithOne(r => r.Apartment)
-                .HasForeignKey(r => r.ApartmentId);
+            modelBuilder.Entity<Resident>()
+                .HasOne(r => r.Apartment)
+                .WithOne()
+                .HasForeignKey<Resident>(p => p.ApartmentId);
 
             modelBuilder.Entity<Vendor>()
                 .HasOne(v => v.Company)

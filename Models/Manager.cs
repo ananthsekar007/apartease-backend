@@ -30,8 +30,5 @@ namespace apartease_backend.Models
 
         public DateTime UpdatedAt { get; set;} = DateTime.Now;
 
-        public virtual Apartment Apartment { get; set; }
-
-
     }
 }
