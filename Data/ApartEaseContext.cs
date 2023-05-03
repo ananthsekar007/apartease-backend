@@ -26,6 +26,8 @@ namespace apartease_backend.Data
 
         public DbSet<Category> Category { get; set; } = default!;
 
+        public DbSet<Amenity> Amenity { get; set; } = default!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Apartment>()
@@ -37,6 +39,11 @@ namespace apartease_backend.Data
                 .HasOne(r => r.Apartment)
                 .WithOne()
                 .HasForeignKey<Resident>(p => p.ApartmentId);
+
+            modelBuilder.Entity<Amenity>()
+                .HasOne(a => a.Apartment)
+                .WithOne()
+                .HasForeignKey<Amenity>(a => a.ApartmentId);
 
             modelBuilder.Entity<Vendor>()
                 .HasOne(v => v.Company)

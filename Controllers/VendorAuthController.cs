@@ -8,23 +8,27 @@ using Microsoft.EntityFrameworkCore;
 using apartease_backend.Data;
 using apartease_backend.Models;
 using apartease_backend.Dao.VendorDao;
-using apartease_backend.Helpers;
-using apartease_backend.Dao.ManagerDao;
 using apartease_backend.Dao;
+using apartease_backend.Services.JwtService;
+using apartease_backend.Services.PasswordService;
 
 namespace apartease_backend.Controllers
 {
     [Route("api/auth/vendor")]
     [ApiController]
-    public class VendorController : ControllerBase
+    public class VendorAuthController : ControllerBase
     {
         private readonly ApartEaseContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IJwtService _jwtService;
+        private readonly IPasswordService _passwordService;
 
-        public VendorController(IConfiguration configuration, ApartEaseContext context)
+        public VendorAuthController(IConfiguration configuration, ApartEaseContext context, IJwtService jwtService, IPasswordService passwordService)
         {
             _context = context;
             _configuration = configuration;
+            _jwtService = jwtService;
+            _passwordService = passwordService;
         }
 
         [HttpPost("signin")]
@@ -40,9 +44,7 @@ namespace apartease_backend.Controllers
 
             if (existingVendor != null) return BadRequest("A vendor is already registered with the company!");
 
-            PasswordHelper passwordHelper = new PasswordHelper();
-
-            passwordHelper.CreatePasswordHash(vendorAuthInput.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            _passwordService.CreatePasswordHash(vendorAuthInput.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
             Vendor newVendor = new Vendor()
             {
@@ -70,9 +72,7 @@ namespace apartease_backend.Controllers
                 Role = "Vendor"
             };
 
-            JwtHelper jwtHelper = new JwtHelper(_configuration);
-
-            string jwtToken = jwtHelper.CreateToken(appUser);
+            string jwtToken = _jwtService.CreateToken(appUser);
 
             VendorAuthResponse response = new VendorAuthResponse()
             {
@@ -92,9 +92,7 @@ namespace apartease_backend.Controllers
 
             if (existingVendor == null) return BadRequest("User does not Exist!");
 
-            PasswordHelper passwordHelper = new PasswordHelper();
-
-            if (!passwordHelper.VerifyPasswordHash(loginInput.Password, existingVendor.PasswordHash, existingVendor.PasswordSalt))
+            if (!_passwordService.VerifyPasswordHash(loginInput.Password, existingVendor.PasswordHash, existingVendor.PasswordSalt))
             {
                 return BadRequest("Please check the login credentials and try again!");
             }
@@ -105,9 +103,7 @@ namespace apartease_backend.Controllers
                 Role = "Vendor"
             };
 
-            JwtHelper jwtHelper = new JwtHelper(_configuration);
-
-            string jwtToken = jwtHelper.CreateToken(appUser);
+            string jwtToken = _jwtService.CreateToken(appUser);
 
             VendorAuthResponse response = new VendorAuthResponse()
             {

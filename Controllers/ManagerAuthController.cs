@@ -8,10 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using apartease_backend.Data;
 using apartease_backend.Models;
 using apartease_backend.Dao;
-using apartease_backend.Helpers;
 using Azure.Core;
 using apartease_backend.Dao.ManagerDao;
 using Microsoft.AspNetCore.Authorization;
+using apartease_backend.Services.JwtService;
+using apartease_backend.Services.PasswordService;
 
 namespace apartease_backend.Controllers
 {
@@ -21,11 +22,15 @@ namespace apartease_backend.Controllers
     {
         private readonly ApartEaseContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IJwtService _jwtService;
+        private readonly IPasswordService _passwordService;
 
-        public ManagerAuthController(IConfiguration configuration, ApartEaseContext context)
+        public ManagerAuthController(IConfiguration configuration, ApartEaseContext context, IJwtService jwtService, IPasswordService passwordService)
         {
             _context = context;
             _configuration = configuration;
+            _jwtService = jwtService;
+            _passwordService = passwordService;
         }
 
         [HttpPost("signin")]
@@ -38,9 +43,7 @@ namespace apartease_backend.Controllers
 
             if (existingManager != null) return BadRequest("User with same email already exists!");
 
-            PasswordHelper passwordHelper = new PasswordHelper();
-
-            passwordHelper.CreatePasswordHash(managerInput.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            _passwordService.CreatePasswordHash(managerInput.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
             Manager newManager = new Manager()
             {
@@ -65,9 +68,7 @@ namespace apartease_backend.Controllers
                 Role = "Manager"
             };
 
-            JwtHelper jwtHelper = new JwtHelper(_configuration);
-
-            string jwtToken = jwtHelper.CreateToken(appUser);
+            string jwtToken = _jwtService.CreateToken(appUser);
 
             ManagerAuthResponse response = new ManagerAuthResponse()
             {
@@ -88,9 +89,7 @@ namespace apartease_backend.Controllers
 
             if (existingManager == null) return BadRequest("User does not Exist!");
 
-            PasswordHelper passwordHelper = new PasswordHelper();
-
-            if (!passwordHelper.VerifyPasswordHash(loginInput.Password, existingManager.PasswordHash, existingManager.PasswordSalt))
+            if (!_passwordService.VerifyPasswordHash(loginInput.Password, existingManager.PasswordHash, existingManager.PasswordSalt))
             {
                 return BadRequest("Please check the login credentials and try again!");
             }
@@ -101,9 +100,7 @@ namespace apartease_backend.Controllers
                 Role = "Manager"
             };
 
-            JwtHelper jwtHelper = new JwtHelper(_configuration);
-
-            string jwtToken = jwtHelper.CreateToken(appUser);
+            string jwtToken = _jwtService.CreateToken(appUser);
 
             ManagerAuthResponse response = new ManagerAuthResponse()
             {

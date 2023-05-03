@@ -8,9 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using apartease_backend.Data;
 using apartease_backend.Models;
 using apartease_backend.Dao.ResidentDao;
-using apartease_backend.Helpers;
-using apartease_backend.Dao.ManagerDao;
 using apartease_backend.Dao;
+using apartease_backend.Services.JwtService;
+using apartease_backend.Services.PasswordService;
 
 namespace apartease_backend.Controllers
 {
@@ -22,10 +22,16 @@ namespace apartease_backend.Controllers
 
         private readonly IConfiguration _configuration;
 
-        public ResidentAuthController(IConfiguration configuration, ApartEaseContext context)
+        private readonly IJwtService _jwtService;
+
+        private readonly IPasswordService _passwordService;
+
+        public ResidentAuthController(IConfiguration configuration, ApartEaseContext context, IJwtService jwtService, IPasswordService passwordService)
         {
             _context = context;
             _configuration = configuration;
+            _jwtService = jwtService;
+            _passwordService = passwordService;
         }
 
         [HttpPost("signin")]
@@ -42,9 +48,7 @@ namespace apartease_backend.Controllers
 
             if (!isApartmentExists) return BadRequest("There is no such apartment!");
 
-            PasswordHelper passwordHelper = new PasswordHelper();
-
-            passwordHelper.CreatePasswordHash(residentAuthInput.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            _passwordService.CreatePasswordHash(residentAuthInput.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
             Resident newResident = new Resident()
             {
@@ -70,9 +74,8 @@ namespace apartease_backend.Controllers
                 Role = "Manager"
             };
 
-            JwtHelper jwtHelper = new JwtHelper(_configuration);
 
-            string jwtToken = jwtHelper.CreateToken(appUser);
+            string jwtToken = _jwtService.CreateToken(appUser);
 
             ResidentAuthResponse response = new ResidentAuthResponse()
             {
@@ -93,9 +96,8 @@ namespace apartease_backend.Controllers
 
             if (existingResident == null) return BadRequest("User does not Exist!");
 
-            PasswordHelper passwordHelper = new PasswordHelper();
 
-            if (!passwordHelper.VerifyPasswordHash(userLoginInput.Password, existingResident.PasswordHash, existingResident.PasswordSalt))
+            if (!_passwordService.VerifyPasswordHash(userLoginInput.Password, existingResident.PasswordHash, existingResident.PasswordSalt))
             {
                 return BadRequest("Please check the login credentials and try again!");
             }
@@ -106,9 +108,7 @@ namespace apartease_backend.Controllers
                 Role = "Resident"
             };
 
-            JwtHelper jwtHelper = new JwtHelper(_configuration);
-
-            string jwtToken = jwtHelper.CreateToken(appUser);
+            string jwtToken = _jwtService.CreateToken(appUser);
 
             ResidentAuthResponse response = new ResidentAuthResponse()
             {

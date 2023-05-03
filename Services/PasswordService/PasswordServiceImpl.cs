@@ -1,9 +1,9 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace apartease_backend.Helpers
+namespace apartease_backend.Services.PasswordService
 {
-    public class PasswordHelper
+    public class PasswordServiceImpl: IPasswordService
     {
         public void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {

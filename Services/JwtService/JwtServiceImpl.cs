@@ -3,14 +3,13 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace apartease_backend.Helpers
+namespace apartease_backend.Services.JwtService
 {
-    public class JwtHelper
+    public class JwtServiceImpl : IJwtService
     {
-
         private readonly IConfiguration _configuration;
 
-        public JwtHelper(IConfiguration configuration)
+        public JwtServiceImpl(IConfiguration configuration)
         {
             _configuration = configuration;
         }

@@ -5,6 +5,9 @@ using apartease_backend.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using apartease_backend.Services.AmenityService;
+using apartease_backend.Services.JwtService;
+using apartease_backend.Services.PasswordService;
 
 namespace apartease_backend
 {
@@ -46,6 +49,10 @@ namespace apartease_backend
                     .AllowCredentials();
                 });
             });
+
+            builder.Services.AddScoped<IAmenityService, AmenityServiceImpl>();
+            builder.Services.AddScoped<IJwtService, JwtServiceImpl>();
+            builder.Services.AddScoped<IPasswordService, PasswordServiceImpl>();
 
 
             builder.Services.AddControllers();
