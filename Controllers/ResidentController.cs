@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using apartease_backend.Data;
 using apartease_backend.Models;
 using apartease_backend.Dao.ResidentDao;
+using apartease_backend.Services.ResidentService;
+using apartease_backend.Dao;
 
 namespace apartease_backend.Controllers
 {
@@ -17,9 +19,12 @@ namespace apartease_backend.Controllers
     {
         private readonly ApartEaseContext _context;
 
-        public ResidentController(ApartEaseContext context)
+        private readonly IResidentService _residentService;
+
+        public ResidentController(ApartEaseContext context, IResidentService residentService)
         {
             _context = context;
+            _residentService = residentService;
         }
 
         //GET: api/resident/get/active/{managerId}
@@ -67,6 +72,16 @@ namespace apartease_backend.Controllers
             await _context.SaveChangesAsync();
 
             return Ok("Status Updated Successfully");
+        }
+
+        [HttpGet("get/status/{residentId}")]
+        public async Task<ActionResult<bool>> GetResidentStatus(int residentId)
+        {
+            ServiceResponse<bool> response = await _residentService.GetActivityStatus(residentId);
+
+            if(response.Error != null) return BadRequest(response.Error);
+
+            return Ok(response.Data);
         }
 
     }

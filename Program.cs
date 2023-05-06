@@ -8,6 +8,8 @@ using System.Text;
 using apartease_backend.Services.AmenityService;
 using apartease_backend.Services.JwtService;
 using apartease_backend.Services.PasswordService;
+using apartease_backend.Services.ResidentService;
+using apartease_backend.Services.AmenityBookingService;
 
 namespace apartease_backend
 {
@@ -50,9 +52,13 @@ namespace apartease_backend
                 });
             });
 
+            //Adding all services to project scope
+
             builder.Services.AddScoped<IAmenityService, AmenityServiceImpl>();
             builder.Services.AddScoped<IJwtService, JwtServiceImpl>();
             builder.Services.AddScoped<IPasswordService, PasswordServiceImpl>();
+            builder.Services.AddScoped<IResidentService, ResidentServiceImpl>();
+            builder.Services.AddScoped<IAmenityBookingService, AmenityBookingServiceImpl>();
 
 
             builder.Services.AddControllers();
