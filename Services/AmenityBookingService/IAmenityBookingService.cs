@@ -10,5 +10,7 @@ namespace apartease_backend.Services.AmenityBookingService
         Task<ServiceResponse<string>> UpdateBooking(AmenityBookingInput amenityBookingInput);
         Task<string> CheckIfBookingIsValid(DateTime from, DateTime to, int minimumBookingHour);
         Task<IEnumerable<AmenityBooking>> GetAmenitiesForResident(int residentId);
+
+        bool CheckIfDateLiesOnWeekend(DateTime from, DateTime to);
     }
 }

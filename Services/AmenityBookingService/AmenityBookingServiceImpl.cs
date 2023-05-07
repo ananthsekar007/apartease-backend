@@ -29,6 +29,12 @@ namespace apartease_backend.Services.AmenityBookingService
                 return response;
             }
 
+            if(!existingAmenity.AllowWeekend && CheckIfDateLiesOnWeekend(amenityBookingInput.From, amenityBookingInput.To))
+            {
+                response.Error = $"{existingAmenity.AmenityName} is closed on weekends!";
+                return response;
+            }
+
             string checkIfAnyErrorInBooking = await CheckIfBookingIsValid(amenityBookingInput.From, amenityBookingInput.To, existingAmenity.MininumBookingHour);
 
             if(checkIfAnyErrorInBooking != "OK")
@@ -74,6 +80,12 @@ namespace apartease_backend.Services.AmenityBookingService
             if (existingAmenity == null)
             {
                 response.Error = "There is no Amenity with the given information";
+                return response;
+            }
+
+            if (!existingAmenity.AllowWeekend && CheckIfDateLiesOnWeekend(amenityBookingInput.From, amenityBookingInput.To))
+            {
+                response.Error = $"{existingAmenity.AmenityName} is closed on weekends!";
                 return response;
             }
 
@@ -134,6 +146,11 @@ namespace apartease_backend.Services.AmenityBookingService
                 .Include(ab => ab.Amenity).Where(x => x.ResidentId == residentId).ToListAsync();
 
             return amenities;
+        }
+
+        public bool CheckIfDateLiesOnWeekend(DateTime fromDate, DateTime toDate)
+        {
+            return fromDate.DayOfWeek == DayOfWeek.Saturday || fromDate.DayOfWeek == DayOfWeek.Sunday || toDate.DayOfWeek == DayOfWeek.Saturday || toDate.DayOfWeek == DayOfWeek.Sunday;
         }
     }
 }
