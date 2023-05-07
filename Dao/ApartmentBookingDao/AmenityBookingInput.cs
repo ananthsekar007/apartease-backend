@@ -13,5 +13,7 @@ namespace apartease_backend.Dao.ApartmentBookingDao
         public DateTime To { get; set; }
         public int ResidentId { get; set; }
 
+        public Nullable<int> AmenityBookingId { get; set; }
+
     }
 }

@@ -2,6 +2,7 @@
 using apartease_backend.Dao.ApartmentBookingDao;
 using apartease_backend.Data;
 using apartease_backend.Models;
+using Azure;
 using Microsoft.EntityFrameworkCore;
 
 namespace apartease_backend.Services.AmenityBookingService
@@ -24,36 +25,18 @@ namespace apartease_backend.Services.AmenityBookingService
 
             if (existingAmenity == null)
             {
-                response.Error = "There is no Amenity with the given text";
+                response.Error = "There is no Amenity with the given information";
                 return response;
             }
 
-            if(amenityBookingInput.To < DateTime.Now || amenityBookingInput.From < DateTime.Now)
+            string checkIfAnyErrorInBooking = await CheckIfBookingIsValid(amenityBookingInput.From, amenityBookingInput.To, existingAmenity.MininumBookingHour);
+
+            if(checkIfAnyErrorInBooking != "OK")
             {
-                response.Error = "Cannot allow to book in past dates!.";
+                response.Error = checkIfAnyErrorInBooking;
                 return response;
             }
 
-            TimeSpan timeDifference = amenityBookingInput.To - amenityBookingInput.From;
-
-            if(timeDifference.TotalMinutes > 240) {
-                response.Error = "The maximum booking time must not exceed 4 hrs!";
-                return response;
-            }
-
-            if(timeDifference.TotalMinutes < (existingAmenity.MininumBookingHour* 60))
-            {
-                response.Error = $"The minimum booking hours should be greater than or equal to {existingAmenity.MininumBookingHour}";
-                return response;
-            }
-
-            bool isBookingConflicting = await _context.AmenityBooking.AnyAsync(b => b.To > amenityBookingInput.From && b.From < amenityBookingInput.To);
-
-            if (isBookingConflicting)
-            {
-                response.Error = "The time slots are un available, please choose different time slots!";
-                return response;
-            }
 
             AmenityBooking newBooking = new AmenityBooking()
             {
@@ -73,6 +56,84 @@ namespace apartease_backend.Services.AmenityBookingService
 
             return response;
 
+        }
+
+        public async Task<ServiceResponse<string>> UpdateBooking(AmenityBookingInput amenityBookingInput)
+        {
+            ServiceResponse<string> response = new ServiceResponse<string>();
+
+            AmenityBooking existingAmenityBooking = await _context.AmenityBooking.FindAsync(amenityBookingInput.AmenityBookingId);
+            if(existingAmenityBooking == null)
+            {
+                response.Error = "No Booking details available for the given information!";
+                return response;
+            }
+
+            Amenity existingAmenity = await _context.Amenity.FindAsync(amenityBookingInput.AmenityId);
+
+            if (existingAmenity == null)
+            {
+                response.Error = "There is no Amenity with the given information";
+                return response;
+            }
+
+
+            string checkIfAnyErrorInBooking = await CheckIfBookingIsValid(amenityBookingInput.From, amenityBookingInput.To, existingAmenity.MininumBookingHour);
+
+            if (checkIfAnyErrorInBooking != "OK")
+            {
+                response.Error = checkIfAnyErrorInBooking;
+                return response;
+            }
+
+            existingAmenityBooking.From = amenityBookingInput.From;
+            existingAmenityBooking.To = amenityBookingInput.To;
+            existingAmenityBooking.GuestEmail = amenityBookingInput.GuestEmail;
+            existingAmenityBooking.GuestName = amenityBookingInput.GuestName;
+
+            await _context.SaveChangesAsync();
+
+            response.Data = "Booking updated successfully!";
+
+            return response;
+
+        }
+
+        public async Task<string> CheckIfBookingIsValid(DateTime fromDate, DateTime toDate, int minimumBookingHour)
+        {
+            if (toDate < DateTime.Now || fromDate < DateTime.Now)
+            {
+                return "Cannot allow to book in past dates!.";
+            }
+
+            TimeSpan timeDifference = toDate - fromDate;
+
+            if (timeDifference.TotalMinutes > 240)
+            {
+                return "The maximum booking time must not exceed 4 hrs!";
+            }
+
+            if (timeDifference.TotalMinutes < (minimumBookingHour * 60))
+            {
+                return $"The minimum booking hours should be greater than or equal to {minimumBookingHour}";
+            }
+
+            bool isBookingConflicting = await _context.AmenityBooking.AnyAsync(b => b.To > fromDate && b.From < toDate);
+
+            if (isBookingConflicting)
+            {
+                return "The time slots are un available, please choose different time slots!";
+            }
+
+            return  "OK";
+        }
+
+        public async Task<IEnumerable<AmenityBooking>> GetAmenitiesForResident(int residentId)
+        {
+            IEnumerable<AmenityBooking> amenities = await _context.AmenityBooking
+                .Include(ab => ab.Amenity).Where(x => x.ResidentId == residentId).ToListAsync();
+
+            return amenities;
         }
     }
 }

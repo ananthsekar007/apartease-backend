@@ -33,7 +33,26 @@ namespace apartease_backend.Controllers
 
             if(response.Error != null) return BadRequest(response.Error);
 
-            return response.Data;
+            return Ok(response.Data);
         }
+
+        [HttpPut("edit")]
+        public async Task<ActionResult<string>> UpdateAmenityBooking(AmenityBookingInput amenityBookingInput)
+        {
+            ServiceResponse<string> response = await _amenityBookingService.UpdateBooking(amenityBookingInput);
+
+            if (response.Error != null) return BadRequest(response.Error);
+
+            return Ok(response.Data);
+        }
+
+        [HttpGet("get/{residentId}")]
+        public async Task<ActionResult<AmenityBooking>> GetAmenitiesForResident(int residentId)
+        {
+            IEnumerable<AmenityBooking> response = await _amenityBookingService.GetAmenitiesForResident(residentId);
+
+            return Ok(response);
+        }
+
     }
 }
