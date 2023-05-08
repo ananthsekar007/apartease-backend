@@ -2,6 +2,7 @@
 using apartease_backend.Dao.ApartmentBookingDao;
 using apartease_backend.Data;
 using apartease_backend.Models;
+using apartease_backend.Services.EmailService;
 using Azure;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +11,11 @@ namespace apartease_backend.Services.AmenityBookingService
     public class AmenityBookingServiceImpl : IAmenityBookingService 
     {
         private readonly ApartEaseContext _context;
-        public AmenityBookingServiceImpl(ApartEaseContext context)
+        private readonly IEmailService _emailService;
+        public AmenityBookingServiceImpl(ApartEaseContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         public async Task<ServiceResponse<string>> BookAmenity(AmenityBookingInput amenityBookingInput)
@@ -21,6 +24,7 @@ namespace apartease_backend.Services.AmenityBookingService
 
             Amenity existingAmenity = await _context.Amenity
                                             .Include(a => a.Apartment)
+                                            .ThenInclude(a => a.Manager)
                                             .FirstOrDefaultAsync(x => x.AmenityId == amenityBookingInput.AmenityId);
 
             if (existingAmenity == null)
@@ -54,6 +58,9 @@ namespace apartease_backend.Services.AmenityBookingService
                 ResidentId = amenityBookingInput.ResidentId,
                 ManagerId = existingAmenity.Apartment.ManagerId
             };
+
+            await _emailService.SendAppEmailAsync(amenityBookingInput.GuestEmail, "Amenity Booking", "Your new amenity booking is successful!");
+            await _emailService.SendAppEmailAsync(existingAmenity.Apartment.Manager.Email, "Amenity Booking", "A resident has booked an amenity!");
 
             await _context.AmenityBooking.AddAsync(newBooking);
             await _context.SaveChangesAsync();
@@ -102,6 +109,8 @@ namespace apartease_backend.Services.AmenityBookingService
             existingAmenityBooking.To = amenityBookingInput.To;
             existingAmenityBooking.GuestEmail = amenityBookingInput.GuestEmail;
             existingAmenityBooking.GuestName = amenityBookingInput.GuestName;
+
+            await _emailService.SendAppEmailAsync(amenityBookingInput.GuestEmail, "Update Amenity Booking", "Your amenity booking has been updated successfully!");
 
             await _context.SaveChangesAsync();
 

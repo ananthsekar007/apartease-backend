@@ -12,6 +12,8 @@ using apartease_backend.Services.ResidentService;
 using apartease_backend.Services.AmenityBookingService;
 using apartease_backend.Services.WorkOrderService;
 using apartease_backend.Services.VendorService;
+using apartease_backend.Services.EmailService;
+using apartease_backend.Dao;
 
 namespace apartease_backend
 {
@@ -55,6 +57,9 @@ namespace apartease_backend
             });
 
             //Adding all services to project scope
+
+            builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetSection("EmailSettings"));
+            builder.Services.AddTransient<IEmailService, EmailServiceImpl>();
 
             builder.Services.AddScoped<IAmenityService, AmenityServiceImpl>();
             builder.Services.AddScoped<IJwtService, JwtServiceImpl>();

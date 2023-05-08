@@ -3,15 +3,19 @@ using apartease_backend.Dao;
 using apartease_backend.Models;
 using apartease_backend.Data;
 using Microsoft.EntityFrameworkCore;
+using apartease_backend.Services.EmailService;
+using apartease_backend.Dao.ApartmentBookingDao;
 
 namespace apartease_backend.Services.WorkOrderService
 {
     public class WorkOrderServiceImpl: IWorkOrderService
     {
         private readonly ApartEaseContext _context;
+        private readonly IEmailService _emailService;
 
-        public WorkOrderServiceImpl(ApartEaseContext context) {
+        public WorkOrderServiceImpl(ApartEaseContext context, IEmailService emailService) {
             _context = context;
+            _emailService = emailService;
         }
 
         public async Task<ServiceResponse<WorkOrder>> AddWorkOrder(WorkOrderInput workOrderInput)
@@ -20,6 +24,7 @@ namespace apartease_backend.Services.WorkOrderService
             ServiceResponse<WorkOrder> response = new ServiceResponse<WorkOrder>();
 
             Resident existingResident = await _context.Resident.FindAsync(workOrderInput.ResidentId);
+            Vendor existingVendor = await _context.Vendor.FindAsync(workOrderInput.VendorId);
 
             if (existingResident == null) {
                 response.Error = "No resident found with the given information!";
@@ -47,6 +52,9 @@ namespace apartease_backend.Services.WorkOrderService
                 await _context.WorkOrder.AddAsync(newWorkOrder);
                 await _context.SaveChangesAsync();
 
+                await _emailService.SendAppEmailAsync(existingResident.Email, "Work Order", "Your new work order creation is successful!");
+                await _emailService.SendAppEmailAsync(existingVendor.Email, "Work Order Assigned", "A resident has assigned a work order to you!");
+
                 response.Data = newWorkOrder;
                 return response;
             }
@@ -63,6 +71,9 @@ namespace apartease_backend.Services.WorkOrderService
             ServiceResponse<string> response = new ServiceResponse<string>();
 
             WorkOrder existingWorkOrder = await _context.WorkOrder.FindAsync(workOrderInput.WorkOrderId);
+            Resident existingResident = await _context.Resident.FindAsync(workOrderInput.ResidentId);
+            Vendor existingVendor = await _context.Vendor.FindAsync(workOrderInput.VendorId);
+
 
             if (existingWorkOrder == null)
             {
@@ -82,6 +93,10 @@ namespace apartease_backend.Services.WorkOrderService
             try
             {
                 await _context.SaveChangesAsync();
+
+                await _emailService.SendAppEmailAsync(existingResident.Email, "Work Order Update", "An existing work order status is updated!");
+                await _emailService.SendAppEmailAsync(existingVendor.Email, "Work Order Update", "An existing work order status is updated!");
+
 
                 response.Data = "Work order is edited!";
                 return response;
