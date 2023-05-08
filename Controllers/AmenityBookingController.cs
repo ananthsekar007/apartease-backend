@@ -46,10 +46,18 @@ namespace apartease_backend.Controllers
             return Ok(response.Data);
         }
 
-        [HttpGet("get/{residentId}")]
+        [HttpGet("get-for-resident/{residentId}")]
         public async Task<ActionResult<AmenityBooking>> GetAmenitiesForResident(int residentId)
         {
             IEnumerable<AmenityBooking> response = await _amenityBookingService.GetAmenitiesForResident(residentId);
+
+            return Ok(response);
+        }
+
+        [HttpGet("get-for-manager/{managerId}")]
+        public async Task<ActionResult<AmenityBooking>> GetAmenitiesForManager(int managerId)
+        {
+            IEnumerable<AmenityBooking> response = await _amenityBookingService.GetBookingsForManager(managerId);
 
             return Ok(response);
         }

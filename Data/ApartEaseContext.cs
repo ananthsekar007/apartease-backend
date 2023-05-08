@@ -30,6 +30,8 @@ namespace apartease_backend.Data
 
         public DbSet<AmenityBooking> AmenityBooking { get; set; } = default!;
 
+        public DbSet<WorkOrder> WorkOrder { get; set; } = default!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Apartment>()
@@ -49,12 +51,12 @@ namespace apartease_backend.Data
 
             modelBuilder.Entity<Vendor>()
                 .HasOne(v => v.Company)
-                .WithOne(c => c.Vendor)
+                .WithOne()
                 .HasForeignKey<Vendor>(v => v.CompanyId);
 
             modelBuilder.Entity<Company>()
                 .HasOne(c => c.Category)
-                .WithMany(cat => cat.Companies)
+                .WithMany()
                 .HasForeignKey(c => c.CategoryId);
 
             modelBuilder.Entity<AmenityBooking>()
@@ -71,6 +73,21 @@ namespace apartease_backend.Data
                 .HasOne(a => a.Resident)
                 .WithOne()
                 .HasForeignKey<AmenityBooking>(a => a.ResidentId);
+
+            modelBuilder.Entity<WorkOrder>()
+                .HasOne(w => w.Apartment)
+                .WithOne()
+                .HasForeignKey<WorkOrder>(w => w.ApartmentId);
+
+            modelBuilder.Entity<WorkOrder>()
+                .HasOne(w => w.Resident)
+                .WithOne()
+                .HasForeignKey<WorkOrder>(w => w.ResidentId);
+
+            modelBuilder.Entity<WorkOrder>()
+                .HasOne(w => w.Vendor)
+                .WithOne()
+                .HasForeignKey<WorkOrder>(w => w.VendorId);
 
         }
     }

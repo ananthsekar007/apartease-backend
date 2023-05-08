@@ -11,6 +11,5 @@ namespace apartease_backend.Models
 
         public string CategoryName { get; set; } = string.Empty;
 
-        public virtual ICollection<Company> Companies { get; set; }
     }
 }

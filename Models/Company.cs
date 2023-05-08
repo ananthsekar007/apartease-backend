@@ -15,9 +15,6 @@ namespace apartease_backend.Models
 
         [ForeignKey("Category")]
         public int CategoryId { get; set; }
-
-        public virtual Vendor Vendor { get; set; }
-
         public virtual Category Category { get; set; }
     }
 }

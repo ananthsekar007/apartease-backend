@@ -10,6 +10,8 @@ using apartease_backend.Services.JwtService;
 using apartease_backend.Services.PasswordService;
 using apartease_backend.Services.ResidentService;
 using apartease_backend.Services.AmenityBookingService;
+using apartease_backend.Services.WorkOrderService;
+using apartease_backend.Services.VendorService;
 
 namespace apartease_backend
 {
@@ -59,6 +61,8 @@ namespace apartease_backend
             builder.Services.AddScoped<IPasswordService, PasswordServiceImpl>();
             builder.Services.AddScoped<IResidentService, ResidentServiceImpl>();
             builder.Services.AddScoped<IAmenityBookingService, AmenityBookingServiceImpl>();
+            builder.Services.AddScoped<IWorkOrderService, WorkOrderServiceImpl>();
+            builder.Services.AddScoped<IVendorService, VendorServiceImpl>();
 
 
             builder.Services.AddControllers();

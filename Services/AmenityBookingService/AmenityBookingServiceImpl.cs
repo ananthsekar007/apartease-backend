@@ -148,6 +148,14 @@ namespace apartease_backend.Services.AmenityBookingService
             return amenities;
         }
 
+        public async Task<IEnumerable<AmenityBooking>> GetBookingsForManager(int managerId)
+        {
+            IEnumerable<AmenityBooking> amenities = await _context.AmenityBooking
+                .Include(ab => ab.Amenity).Include(ab => ab.Resident).Where(x => x.ManagerId == managerId).ToListAsync();
+
+            return amenities;
+        }
+
         public bool CheckIfDateLiesOnWeekend(DateTime fromDate, DateTime toDate)
         {
             return fromDate.DayOfWeek == DayOfWeek.Saturday || fromDate.DayOfWeek == DayOfWeek.Sunday || toDate.DayOfWeek == DayOfWeek.Saturday || toDate.DayOfWeek == DayOfWeek.Sunday;
