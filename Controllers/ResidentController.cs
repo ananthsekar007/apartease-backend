@@ -10,11 +10,13 @@ using apartease_backend.Models;
 using apartease_backend.Dao.ResidentDao;
 using apartease_backend.Services.ResidentService;
 using apartease_backend.Dao;
+using Microsoft.AspNetCore.Authorization;
 
 namespace apartease_backend.Controllers
 {
     [Route("api/resident")]
     [ApiController]
+    [Authorize]
     public class ResidentController : ControllerBase
     {
         private readonly ApartEaseContext _context;

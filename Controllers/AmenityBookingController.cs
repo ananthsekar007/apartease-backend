@@ -10,11 +10,13 @@ using apartease_backend.Models;
 using apartease_backend.Services.AmenityBookingService;
 using apartease_backend.Dao.ApartmentBookingDao;
 using apartease_backend.Dao;
+using Microsoft.AspNetCore.Authorization;
 
 namespace apartease_backend.Controllers
 {
     [Route("api/amenitybooking")]
     [ApiController]
+    [Authorize(Roles = "Manager, Resident")]
     public class AmenityBookingController : ControllerBase
     {
         private readonly ApartEaseContext _context;

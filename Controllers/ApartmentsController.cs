@@ -8,11 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using apartease_backend.Data;
 using apartease_backend.Models;
 using apartease_backend.Dao.ApartmentDao;
+using Microsoft.AspNetCore.Authorization;
 
 namespace apartease_backend.Controllers
 {
     [Route("api/apartments")]
     [ApiController]
+    [Authorize]
     public class ApartmentsController : ControllerBase
     {
         private readonly ApartEaseContext _context;

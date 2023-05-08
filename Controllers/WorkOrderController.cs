@@ -10,11 +10,13 @@ using apartease_backend.Models;
 using apartease_backend.Services.WorkOrderService;
 using apartease_backend.Dao.WorkOrderDao;
 using apartease_backend.Dao;
+using Microsoft.AspNetCore.Authorization;
 
 namespace apartease_backend.Controllers
 {
     [Route("api/workorder")]
     [ApiController]
+    [Authorize(Roles = "Vendor,  Resident")]
     public class WorkOrderController : ControllerBase
     {
         private readonly ApartEaseContext _context;

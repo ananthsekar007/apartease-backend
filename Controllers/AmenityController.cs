@@ -11,11 +11,13 @@ using apartease_backend.Services.AmenityService;
 using apartease_backend.Dao;
 using System.Collections.ObjectModel;
 using apartease_backend.Dao.AmenityDao;
+using Microsoft.AspNetCore.Authorization;
 
 namespace apartease_backend.Controllers
 {
     [Route("api/amenity")]
     [ApiController]
+    [Authorize]
     public class AmenityController : ControllerBase
     {
         private readonly IAmenityService _amenityService;
